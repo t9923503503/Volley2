@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рейтинг игроков — Лютые Пляжники</title>
+<meta name="description" content="Публичный рейтинг игроков и история турниров пляжного волейбола King of the Court">
+<meta name="theme-color" content="#0d0d1a">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & base ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:       #0d0d1a;
+  --bg2:      #10101e;
+  --card:     #0d1015;
+  --border:   #1e1e34;
+  --gold:     #ffd700;
+  --gold2:    #ffb700;
+  --silver:   #c0c0c0;
+  --bronze:   #cd7f32;
+  --red:      #e94560;
+  --blue:     #4DA8DA;
+  --green:    #6ABF69;
+  --purple:   #9b5de5;
+  --text:     #e8e8f0;
+  --sub:      #8888aa;
+  --font-h:   'Bebas Neue', 'Barlow Condensed', sans-serif;
+  --font-b:   'Barlow Condensed', 'Barlow', sans-serif;
+  --font-r:   'Barlow', system-ui, sans-serif;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-r);
+  font-size: 14px;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ───────────────────────────────────────────── */
+.site-header {
+  background: linear-gradient(180deg, #0a0a16 0%, #0d0d1a 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px 12px;
+  text-align: center;
+  position: sticky; top: 0; z-index: 100;
+}
+.site-header-brand {
+  font-family: var(--font-h);
+  font-size: clamp(22px, 5vw, 36px);
+  letter-spacing: 2px;
+  color: var(--gold);
+  line-height: 1;
+}
+.site-header-sub {
+  font-family: var(--font-b);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--sub);
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+.back-link {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: var(--sub); text-decoration: none; font-family: var(--font-b);
+  font-size: 13px; letter-spacing: 1px;
+  display: flex; align-items: center; gap: 4px;
+}
+.back-link:hover { color: var(--text); }
+
+/* ── Layout ───────────────────────────────────────────── */
+.page { max-width: 720px; margin: 0 auto; padding: 16px 12px 40px; }
+
+/* ── Status bar ───────────────────────────────────────── */
+.status-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--sub);
+}
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--sub); flex-shrink: 0;
+  transition: background .3s;
+}
+.status-dot.live   { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-dot.error  { background: var(--red); }
+.status-updated { margin-left: auto; }
+
+/* ── Tabs ─────────────────────────────────────────────── */
+.tabs {
+  display: flex; gap: 4px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 4px;
+  margin-bottom: 16px;
+}
+.tab-btn {
+  flex: 1; border: none; cursor: pointer;
+  background: transparent; color: var(--sub);
+  font-family: var(--font-b); font-size: 13px;
+  font-weight: 700; letter-spacing: 1px;
+  padding: 8px 4px; border-radius: 7px;
+  transition: background .2s, color .2s;
+  text-transform: uppercase;
+}
+.tab-btn.active {
+  background: var(--border); color: var(--text);
+}
+.tab-btn:hover:not(.active) { color: var(--text); }
+
+/* ── Section title ────────────────────────────────────── */
+.section-title {
+  font-family: var(--font-h);
+  font-size: 20px; letter-spacing: 1px;
+  color: var(--gold); margin: 0 0 12px;
+}
+
+/* ── Podium ───────────────────────────────────────────── */
+.podium {
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 8px; margin-bottom: 20px; padding: 0 8px;
+}
+.podium-item { flex: 1; max-width: 160px; }
+.podium-col {
+  border-radius: 10px 10px 0 0;
+  padding: 12px 8px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  position: relative;
+  background: var(--card);
+}
+.podium-col.p1 {
+  border-color: var(--gold); min-height: 110px;
+  background: linear-gradient(180deg, rgba(255,215,0,.08) 0%, var(--card) 100%);
+}
+.podium-col.p2 {
+  border-color: var(--silver); min-height: 80px;
+  background: linear-gradient(180deg, rgba(192,192,192,.06) 0%, var(--card) 100%);
+}
+.podium-col.p3 {
+  border-color: var(--bronze); min-height: 65px;
+  background: linear-gradient(180deg, rgba(205,127,50,.06) 0%, var(--card) 100%);
+}
+.podium-medal { font-size: 22px; display: block; margin-bottom: 4px; }
+.podium-name {
+  font-family: var(--font-b); font-weight: 700;
+  font-size: clamp(11px, 2.5vw, 14px);
+  line-height: 1.2; display: block; margin-bottom: 4px;
+}
+.podium-pts {
+  font-family: var(--font-h); font-size: 18px;
+  display: block; line-height: 1;
+}
+.podium-col.p1 .podium-pts { color: var(--gold); }
+.podium-col.p2 .podium-pts { color: var(--silver); }
+.podium-col.p3 .podium-pts { color: var(--bronze); }
+.podium-lbl {
+  font-size: 10px; color: var(--sub);
+  text-transform: uppercase; letter-spacing: 1px;
+  display: block; margin-top: 2px;
+}
+.podium-trn { font-size: 11px; color: var(--sub); margin-top: 3px; display: block; }
+
+/* ── Rating list ──────────────────────────────────────── */
+.rating-list { display: flex; flex-direction: column; gap: 6px; }
+.rating-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px;
+  border-left-width: 3px;
+  transition: background .15s;
+}
+.rating-row:hover { background: #141422; }
+.rank-num {
+  font-family: var(--font-h); font-size: 18px;
+  width: 28px; text-align: center; flex-shrink: 0;
+  color: var(--sub);
+}
+.rank-info { flex: 1; min-width: 0; }
+.rank-name {
+  font-family: var(--font-b); font-weight: 700;
+  font-size: 15px; line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rank-meta {
+  display: flex; gap: 8px; margin-top: 3px;
+  font-size: 11px; color: var(--sub); flex-wrap: wrap;
+}
+.rank-pts {
+  font-family: var(--font-h); font-size: 20px;
+  color: var(--gold); flex-shrink: 0;
+}
+.rank-pts small { font-size: 11px; color: var(--sub); display: block; text-align: right; }
+.zone-badge {
+  font-family: var(--font-b); font-size: 9px; font-weight: 700;
+  letter-spacing: 1px; padding: 2px 6px; border-radius: 4px;
+  text-transform: uppercase; flex-shrink: 0;
+}
+.z-hard   { background: rgba(233,69,96,.18); color: var(--red); }
+.z-medium { background: rgba(77,168,218,.18); color: var(--blue); }
+.z-lite   { background: rgba(106,191,105,.18); color: var(--green); }
+
+/* ── History ──────────────────────────────────────────── */
+.hist-list { display: flex; flex-direction: column; gap: 10px; }
+.hist-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.hist-head {
+  padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.hist-date-block {
+  flex-shrink: 0; text-align: center;
+  background: var(--border); border-radius: 8px;
+  padding: 6px 10px; min-width: 52px;
+}
+.hist-date-day  { font-family: var(--font-h); font-size: 26px; line-height: 1; color: var(--gold); }
+.hist-date-mon  { font-size: 11px; text-transform: uppercase; color: var(--sub); letter-spacing: 1px; }
+.hist-info { flex: 1; min-width: 0; }
+.hist-name {
+  font-family: var(--font-b); font-weight: 700; font-size: 16px;
+  line-height: 1.2; margin-bottom: 4px;
+}
+.hist-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.hist-tag {
+  font-size: 10px; padding: 2px 7px; border-radius: 10px;
+  background: var(--border); color: var(--sub);
+  font-family: var(--font-b); letter-spacing: .5px;
+}
+.hist-results { padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+.hist-result-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px;
+}
+.hist-place { font-size: 18px; flex-shrink: 0; }
+.hist-player-name { flex: 1; font-family: var(--font-b); font-weight: 600; }
+.hist-pts {
+  font-family: var(--font-b); font-weight: 700;
+  font-size: 13px; color: var(--sub);
+}
+.hist-rpts { font-size: 11px; color: var(--gold); margin-left: 4px; }
+
+/* ── Empty state ──────────────────────────────────────── */
+.empty-state {
+  text-align: center; padding: 48px 20px;
+  color: var(--sub);
+}
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-title { font-family: var(--font-b); font-size: 18px; color: var(--text); margin-bottom: 6px; }
+
+/* ── Skeleton loader ──────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.skel {
+  border-radius: 6px; height: 14px;
+  background: linear-gradient(90deg, var(--border) 25%, #2a2a44 50%, var(--border) 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+.skel-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px; margin-bottom: 6px;
+}
+
+/* ── Error banner ─────────────────────────────────────── */
+.error-banner {
+  background: rgba(233,69,96,.12); border: 1px solid rgba(233,69,96,.3);
+  border-radius: 8px; padding: 12px 14px;
+  color: var(--red); font-size: 13px; margin-bottom: 16px;
+}
+
+/* ── Footer ───────────────────────────────────────────── */
+.page-footer {
+  text-align: center; margin-top: 32px;
+  color: var(--sub); font-size: 12px; line-height: 1.8;
+}
+.page-footer a { color: var(--sub); }
+.page-footer a:hover { color: var(--gold); }
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .podium { gap: 4px; padding: 0; }
+  .podium-col.p1 { min-height: 90px; }
+  .podium-col.p2 { min-height: 68px; }
+  .podium-col.p3 { min-height: 55px; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="back-link" href="index.html">← Приложение</a>
+  <div class="site-header-brand">🏐 ЛЮТЫЕ ПЛЯЖНИКИ !!</div>
+  <div class="site-header-sub">King of the Court · Публичный рейтинг</div>
+</header>
+
+<main class="page">
+
+  <!-- Status bar -->
+  <div class="status-bar" id="status-bar">
+    <span class="status-dot" id="status-dot"></span>
+    <span id="status-text">Загрузка…</span>
+    <span class="status-updated" id="status-updated"></span>
+  </div>
+
+  <!-- Tabs: Рейтинг М / Ж / Микст / История -->
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" role="tab" data-tab="M"   onclick="switchTab('M')">🏋️ М</button>
+    <button class="tab-btn"        role="tab" data-tab="W"   onclick="switchTab('W')">👩 Ж</button>
+    <button class="tab-btn"        role="tab" data-tab="Mix" onclick="switchTab('Mix')">🤝 Микст</button>
+    <button class="tab-btn"        role="tab" data-tab="history" onclick="switchTab('history')">📅 История</button>
+  </div>
+
+  <!-- Content area -->
+  <div id="content">
+    <div id="skel-placeholder">
+      <div class="skel-row"><div class="skel" style="width:32px;height:32px;border-radius:50%"></div><div style="flex:1"><div class="skel" style="width:60%;margin-bottom:6px"></div><div class="skel" style="width:40%;height:10px"></div></div><div class="skel" style="width:48px;height:28px"></div></div>
+      <div class="skel-row"><div class="skel" style="width:32px;height:32px;border-radius:50%"></div><div style="flex:1"><div class="skel" style="width:55%;margin-bottom:6px"></div><div class="skel" style="width:35%;height:10px"></div></div><div class="skel" style="width:48px;height:28px"></div></div>
+      <div class="skel-row"><div class="skel" style="width:32px;height:32px;border-radius:50%"></div><div style="flex:1"><div class="skel" style="width:70%;margin-bottom:6px"></div><div class="skel" style="width:30%;height:10px"></div></div><div class="skel" style="width:48px;height:28px"></div></div>
+    </div>
+  </div>
+
+  <footer class="page-footer">
+    <div>Данные обновляются после каждого турнира</div>
+    <div><a href="index.html">← Открыть приложение</a></div>
+  </footer>
+
+</main>
+
+<script>
+'use strict';
+
+// ── Constants ──────────────────────────────────────────────
+const MEDALS     = ['🥇','🥈','🥉'];
+const ZONE_LIMIT = [10, 20];
+
+// ── State ──────────────────────────────────────────────────
+let _cache          = {};    // per-tab rendered-data cache
+let _activeTab      = 'M';
+let _lastUpdated    = '';    // ISO date from JSON "updated" field
+let _rawLeaderboard = null;  // parsed leaderboard.json (all types)
+let _rawHistory     = null;  // parsed history.json
+
+// ── Init ───────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => { loadTab('M'); });
+
+// ── Tab switching ──────────────────────────────────────────
+function switchTab(tab) {
+  _activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  loadTab(tab);
+}
+
+async function loadTab(tab) {
+  if (_cache[tab]) { render(tab, _cache[tab]); return; }
+  showSkeleton();
+  setStatus('loading', 'Загрузка…');
+  try {
+    const data = tab === 'history' ? await fetchHistory() : await fetchLeaderboard(tab);
+    _cache[tab] = data;
+    render(tab, data);
+    setStatus('live', 'Данные загружены');
+    setUpdated();
+  } catch(e) {
+    console.error(e);
+    setStatus('error', 'Ошибка загрузки');
+    renderError(e.message || 'Не удалось загрузить данные');
+  }
+}
+
+// ── Data fetching ──────────────────────────────────────────
+// Data lives in data/leaderboard.json and data/history.json.
+// To update: use the "Скачать JSON" button in the Players screen (roster access
+// required), then git commit + push to the repo — only the repo admin can publish.
+
+async function fetchLeaderboard(type) {
+  if (!_rawLeaderboard) {
+    const r = await fetch('./data/leaderboard.json');
+    if (!r.ok) throw new Error('data/leaderboard.json не найден (HTTP ' + r.status + ')');
+    _rawLeaderboard = await r.json();
+    _lastUpdated = _rawLeaderboard.updated || '';
+    // Pre-cache all tabs so switching between М/Ж/Микст is instant
+    ['M','W','Mix'].forEach(t => {
+      _cache[t] = Array.isArray(_rawLeaderboard[t]) ? _rawLeaderboard[t] : [];
+    });
+  }
+  return _cache[type] || [];
+}
+
+async function fetchHistory() {
+  if (!_rawHistory) {
+    const r = await fetch('./data/history.json');
+    if (!r.ok) throw new Error('data/history.json не найден (HTTP ' + r.status + ')');
+    _rawHistory = await r.json();
+    if (!_lastUpdated && _rawHistory.updated) _lastUpdated = _rawHistory.updated;
+  }
+  return Array.isArray(_rawHistory.tournaments) ? _rawHistory.tournaments : [];
+}
+
+// ── Rendering ──────────────────────────────────────────────
+function render(tab, data) {
+  const el = document.getElementById('content');
+  if (tab === 'history') {
+    el.innerHTML = renderHistory(data);
+  } else {
+    el.innerHTML = renderLeaderboard(tab, data);
+  }
+}
+
+function renderLeaderboard(type, rows) {
+  if (!rows || rows.length === 0) {
+    return `<div class="empty-state">
+      <div class="empty-icon">🏆</div>
+      <div class="empty-title">Нет данных</div>
+      <div>Рейтинг появится после первого турнира</div>
+    </div>`;
+  }
+
+  const typeLabel = type === 'W' ? 'Женский' : type === 'Mix' ? 'Микст' : 'Мужской';
+
+  // Podium
+  const [p1, p2, p3] = rows;
+  function podCol(p, cls, medal) {
+    if (!p) return '';
+    const avg = p.tournaments > 0 ? (p.rating / p.tournaments).toFixed(1) : '—';
+    return `<div class="podium-item">
+      <div class="podium-col ${cls}">
+        <span class="podium-medal">${medal}</span>
+        <span class="podium-name">${esc(firstName(p.name))}</span>
+        <span class="podium-pts">${p.rating}</span>
+        <span class="podium-lbl">рейт.</span>
+        <span class="podium-trn">⚡ ${avg} ср. · 🏆 ${p.tournaments}</span>
+      </div>
+    </div>`;
+  }
+
+  let podiumHtml = '';
+  if (rows.length >= 2) {
+    podiumHtml = `<div class="podium">
+      ${podCol(p2, 'p2', '🥈')}
+      ${podCol(p1, 'p1', '🥇')}
+      ${podCol(p3, 'p3', '🥉')}
+    </div>`;
+  }
+
+  // List (4+)
+  const listRows = rows.slice(3).map((p, idx) => {
+    const rank = idx + 4;
+    const zone = rank <= ZONE_LIMIT[0] ? 'hard' : rank <= ZONE_LIMIT[1] ? 'medium' : 'lite';
+    const zoneLabel = zone === 'hard' ? 'HARD' : zone === 'medium' ? 'MEDIUM' : 'LITE';
+    const borderColor = zone === 'hard' ? 'var(--red)' : zone === 'medium' ? 'var(--blue)' : 'var(--green)';
+    const avg = p.tournaments > 0 ? (p.rating / p.tournaments).toFixed(1) : '—';
+    const genderIcon = p.gender === 'W' ? '👩' : '🏋️';
+    const lastSeen = p.last_seen ? fmtDate(p.last_seen) : '';
+    return `<div class="rating-row" style="border-left-color:${borderColor}">
+      <div class="rank-num">${rank}</div>
+      <div class="rank-info">
+        <div class="rank-name">${genderIcon} ${esc(p.name)}</div>
+        <div class="rank-meta">
+          <span>🏆 ${p.tournaments} турн.</span>
+          <span>📊 ${avg} ср.</span>
+          ${p.wins > 0 ? `<span>🥇 ${p.wins} побед</span>` : ''}
+          ${lastSeen ? `<span>📅 ${lastSeen}</span>` : ''}
+        </div>
+      </div>
+      <div class="rank-pts">${p.rating}<small>рейт.</small></div>
+      <div class="zone-badge z-${zone}">${zoneLabel}</div>
+    </div>`;
+  }).join('');
+
+  // Top-3 also in list with medals for better readability
+  const top3Rows = rows.slice(0, Math.min(3, rows.length)).map((p, idx) => {
+    const borderColor = idx === 0 ? 'var(--gold)' : idx === 1 ? 'var(--silver)' : 'var(--bronze)';
+    const avg = p.tournaments > 0 ? (p.rating / p.tournaments).toFixed(1) : '—';
+    const genderIcon = p.gender === 'W' ? '👩' : '🏋️';
+    const lastSeen = p.last_seen ? fmtDate(p.last_seen) : '';
+    return `<div class="rating-row" style="border-left-color:${borderColor}">
+      <div class="rank-num" style="font-size:22px">${MEDALS[idx]}</div>
+      <div class="rank-info">
+        <div class="rank-name">${genderIcon} ${esc(p.name)}</div>
+        <div class="rank-meta">
+          <span>🏆 ${p.tournaments} турн.</span>
+          <span>📊 ${avg} ср.</span>
+          ${p.wins > 0 ? `<span>🥇 ${p.wins} побед</span>` : ''}
+          ${lastSeen ? `<span>📅 ${lastSeen}</span>` : ''}
+        </div>
+      </div>
+      <div class="rank-pts">${p.rating}<small>рейт.</small></div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="section-title">🔥 РЕЙТИНГ · ${typeLabel.toUpperCase()}</div>
+    ${podiumHtml}
+    <div class="rating-list">
+      ${top3Rows}
+      ${listRows}
+    </div>`;
+}
+
+function renderHistory(items) {
+  if (!items || items.length === 0) {
+    return `<div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <div class="empty-title">История пуста</div>
+      <div>Завершённые турниры появятся здесь</div>
+    </div>`;
+  }
+
+  const cards = items.map(t => {
+    const d     = t.date ? new Date(t.date + 'T12:00:00') : null;
+    const day   = d ? d.getDate() : '';
+    const mon   = d ? d.toLocaleString('ru', { month: 'short' }) : '';
+    const top3  = Array.isArray(t.top3) ? t.top3.slice(0, 3) : [];
+    const placeIcons = ['🥇','🥈','🥉'];
+
+    const resultsHtml = top3.length ? top3.map((r, i) => {
+      const gIcon = r.gender === 'W' ? '👩' : '🏋️';
+      return `<div class="hist-result-row">
+        <span class="hist-place">${placeIcons[i]}</span>
+        <span class="hist-player-name">${gIcon} ${esc(r.name)}</span>
+        <span class="hist-pts">${r.game_pts} оч</span>
+        <span class="hist-rpts">+${r.rating_pts}рт</span>
+      </div>`;
+    }).join('') : `<div style="color:var(--sub);font-size:12px;padding:4px 0">Нет данных о результатах</div>`;
+
+    return `<div class="hist-card">
+      <div class="hist-head">
+        ${day ? `<div class="hist-date-block">
+          <div class="hist-date-day">${day}</div>
+          <div class="hist-date-mon">${mon}</div>
+        </div>` : ''}
+        <div class="hist-info">
+          <div class="hist-name">${esc(t.name || 'Без названия')}</div>
+          <div class="hist-tags">
+            ${t.division ? `<span class="hist-tag">${esc(t.division)}</span>` : ''}
+            ${t.format   ? `<span class="hist-tag">${esc(t.format)}</span>`   : ''}
+          </div>
+        </div>
+      </div>
+      <div class="hist-results">${resultsHtml}</div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="section-title">📅 ИСТОРИЯ ТУРНИРОВ</div>
+    <div class="hist-list">${cards}</div>`;
+}
+
+// ── Status helpers ─────────────────────────────────────────
+function setStatus(state, msg) {
+  const dot  = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  dot.className  = 'status-dot' + (state === 'live' ? ' live' : state === 'error' ? ' error' : '');
+  text.textContent = msg;
+}
+function setUpdated() {
+  const el = document.getElementById('status-updated');
+  if (!el) return;
+  if (_lastUpdated) {
+    try {
+      const d = new Date(_lastUpdated);
+      el.textContent = 'Данные от: ' + d.toLocaleDateString('ru', { day:'numeric', month:'short', year:'numeric' });
+    } catch(e) {
+      el.textContent = 'Данные от: ' + _lastUpdated.slice(0, 10);
+    }
+  } else {
+    el.textContent = '';
+  }
+}
+function showSkeleton() {
+  document.getElementById('content').innerHTML = `
+    <div>
+      ${[1,2,3,4,5].map(() => `
+        <div class="skel-row">
+          <div class="skel" style="width:32px;height:32px;border-radius:50%;flex-shrink:0"></div>
+          <div style="flex:1">
+            <div class="skel" style="width:${50+Math.random()*30|0}%;margin-bottom:7px"></div>
+            <div class="skel" style="width:${30+Math.random()*20|0}%;height:10px"></div>
+          </div>
+          <div class="skel" style="width:44px;height:28px;border-radius:4px"></div>
+        </div>`).join('')}
+    </div>`;
+}
+function renderError(msg) {
+  const notPublished = msg.includes('не найден') || msg.includes('404') || msg.includes('403');
+  document.getElementById('content').innerHTML =
+    `<div class="error-banner">⚠️ ${esc(msg)}</div>
+     <div class="empty-state">
+       <div class="empty-icon">${notPublished ? '📭' : '📡'}</div>
+       <div class="empty-title">${notPublished ? 'Рейтинг не опубликован' : 'Ошибка загрузки'}</div>
+       <div>${notPublished
+         ? 'Организатор ещё не загрузил данные в репозиторий'
+         : 'Проверьте подключение и <a href="" style="color:var(--blue)">обновите страницу</a>'}</div>
+     </div>`;
+}
+
+// ── Utils ──────────────────────────────────────────────────
+function esc(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function firstName(name) {
+  if (!name) return '';
+  const parts = name.trim().split(/\s+/);
+  return parts[0];
+}
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso + 'T12:00:00');
+  return d.toLocaleDateString('ru', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+</script>
+</body>
+</html>

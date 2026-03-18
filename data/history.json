@@ -1,0 +1,54 @@
+{
+  "_note": "История 2 турниров. git commit + push data/ для публикации.",
+  "updated": "2026-03-07T20:00:00.000Z",
+  "tournaments": [
+    {
+      "id": "t20260307M",
+      "name": "Король и Королева корта — Мужчины",
+      "date": "2026-03-07",
+      "format": "King of the Court",
+      "division": "Мужской",
+      "top3": [
+        { "name": "Лебедев",  "gender": "M", "game_pts": 33, "rating_pts": 100 },
+        { "name": "Соболев",  "gender": "M", "game_pts": 26, "rating_pts":  90 },
+        { "name": "Яковлев",  "gender": "M", "game_pts": 25, "rating_pts":  82 }
+      ]
+    },
+    {
+      "id": "t20260307W",
+      "name": "Король и Королева корта — Женщины",
+      "date": "2026-03-07",
+      "format": "King of the Court",
+      "division": "Женский",
+      "top3": [
+        { "name": "Микишева",   "gender": "W", "game_pts": 35, "rating_pts": 100 },
+        { "name": "Черемис В",  "gender": "W", "game_pts": 29, "rating_pts":  90 },
+        { "name": "Сайдуллина", "gender": "W", "game_pts": 24, "rating_pts":  82 }
+      ]
+    },
+    {
+      "id": "t20260223M",
+      "name": "Король и Королева корта — Мужчины",
+      "date": "2026-02-23",
+      "format": "Round Robin",
+      "division": "Мужской",
+      "top3": [
+        { "name": "Яковлев", "gender": "M", "game_pts":  9, "rating_pts": 100 },
+        { "name": "Лебедев", "gender": "M", "game_pts":  6, "rating_pts":  90 },
+        { "name": "Терехов", "gender": "M", "game_pts":  3, "rating_pts":  82 }
+      ]
+    },
+    {
+      "id": "t20260223W",
+      "name": "Король и Королева корта — Женщины",
+      "date": "2026-02-23",
+      "format": "Round Robin",
+      "division": "Женский",
+      "top3": [
+        { "name": "Стрекалова", "gender": "W", "game_pts": 11, "rating_pts": 100 },
+        { "name": "Файзулина",  "gender": "W", "game_pts":  6, "rating_pts":  90 },
+        { "name": "Робак",      "gender": "W", "game_pts":  4, "rating_pts":  82 }
+      ]
+    }
+  ]
+}

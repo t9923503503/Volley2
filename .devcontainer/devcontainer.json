@@ -1,0 +1,32 @@
+{
+  "name": "Volley (static + Playwright)",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "postCreateCommand": "npm ci && npx playwright install chromium --with-deps",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-playwright.playwright",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "forwardPorts": [8000, 9011],
+  "portsAttributes": {
+    "8000": {
+      "label": "Static dev server",
+      "onAutoForward": "notify"
+    },
+    "9011": {
+      "label": "Playwright webServer (smoke)",
+      "onAutoForward": "ignore"
+    }
+  },
+  "remoteUser": "node",
+  "shutdownAction": "none"
+}
+

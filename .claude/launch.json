@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Dev Server (port 8000)",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/http-server/bin/http-server", ".", "-p", "8000", "-c-1"],
+      "port": 8000
+    },
+    {
+      "name": "Smoke Test Server (port 9011)",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/http-server/bin/http-server", ".", "-p", "9011", "-c-1"],
+      "port": 9011
+    }
+  ]
+}

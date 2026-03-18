@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карточка игрока — Лютые пляжники</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ====== CSS ПЕРЕМЕННЫЕ ====== */
+        :root {
+            --color-fire: #FF5722;        /* Огненный оранжевый */
+            --color-ice: #1E90FF;         /* Ледяной синий */
+            --color-gold: #FFD700;        /* Золото */
+            --color-dark: #0f0f0f;        /* Угольно-чёрный */
+            --color-gray: #1a1a1a;        /* Глубокий серый */
+            --color-text: #f0f0f0;        /* Белый текст */
+            --color-text-muted: #a0a0a0;  /* Приглушённый текст */
+            --border-radius: 12px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-gray) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        /* ====== ГЛАВНЫЙ КОНТЕЙНЕР КАРТОЧКИ ====== */
+        .player-card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(15, 15, 15, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 87, 34, 0.3);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow:
+                0 0 40px rgba(255, 87, 34, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Активное состояние при наведении на desktop */
+        @media (hover: hover) {
+            .player-card:hover {
+                border-color: rgba(255, 87, 34, 0.6);
+                box-shadow:
+                    0 0 60px rgba(255, 87, 34, 0.25),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                transform: translateY(-2px);
+            }
+        }
+
+        /* Фоновый градиент (скрытый слой) */
+        .player-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(255, 87, 34, 0.05) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        /* ====== HEADER СЕКЦИЯ ====== */
+        .card-header {
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Аватар с кольцом */
+        .avatar-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 16px;
+        }
+
+        .avatar-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--color-fire) 0%, var(--color-ice) 100%);
+            padding: 3px;
+            animation: ring-glow 3s ease-in-out infinite;
+        }
+
+        .avatar-ring::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 50%;
+            background: rgba(15, 15, 15, 0.9);
+        }
+
+        .avatar-img {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            object-fit: cover;
+            z-index: 2;
+        }
+
+        /* Анимация свечения кольца */
+        @keyframes ring-glow {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(255, 87, 34, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(255, 87, 34, 0.8);
+            }
+        }
+
+        .nickname {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-text);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        /* Ранг-бейдж */
+        .rank-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--color-fire), rgba(255, 87, 34, 0.7));
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+        }
+
+        /* ====== STATS СЕКЦИЯ (ГЛАВНЫЕ ЦИФРЫ) ====== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-item {
+            background: rgba(30, 144, 255, 0.08);
+            border: 1px solid rgba(30, 144, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            transition: all var(--transition);
+        }
+
+        @media (hover: hover) {
+            .stat-item:hover {
+                background: rgba(30, 144, 255, 0.15);
+                border-color: rgba(30, 144, 255, 0.5);
+                transform: translateY(-2px);
+            }
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--color-ice);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 11px;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ====== ДОСТИЖЕНИЯ ====== */
+        .achievements-section {
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--color-fire), transparent);
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+            gap: 8px;
+        }
+
+        .achievement-badge {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all var(--transition);
+            position: relative;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .achievement-badge.gold {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--color-gold);
+        }
+
+        .achievement-badge.silver {
+            background: rgba(192, 192, 192, 0.1);
+            color: #c0c0c0;
+        }
+
+        .achievement-badge.bronze {
+            background: rgba(205, 127, 50, 0.1);
+            color: #cd7f32;
+        }
+
+        @media (hover: hover) {
+            .achievement-badge:hover {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px currentColor;
+                border-color: currentColor;
+            }
+        }
+
+        /* ====== ЛИЧНАЯ ИНФОРМАЦИЯ ====== */
+        .personal-info {
+            background: rgba(255, 87, 34, 0.08);
+            border: 1px solid rgba(255, 87, 34, 0.2);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-fire);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .social-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background: rgba(255, 87, 34, 0.15);
+            color: var(--color-fire);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all var(--transition);
+            cursor: pointer;
+        }
+
+        @media (hover: hover) {
+            .social-icon:hover {
+                background: rgba(255, 87, 34, 0.3);
+                transform: scale(1.1);
+            }
+        }
+
+        /* ====== ИСТОРИЯ ТУРНИРОВ ====== */
+        .history-section {
+            position: relative;
+            z-index: 1;
+        }
+
+        .history-table {
+            width: 100%;
+            font-size: 12px;
+            border-collapse: collapse;
+        }
+
+        .history-table thead {
+            border-bottom: 1px solid rgba(255, 87, 34, 0.3);
+        }
+
+        .history-table th {
+            text-align: left;
+            padding: 10px 0;
+            color: var(--color-gold);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .history-table td {
+            padding: 10px 0;
+            color: var(--color-text);
+            border-bottom: 1px solid rgba(255, 87, 34, 0.1);
+        }
+
+        .tournament-name {
+            font-weight: 600;
+        }
+
+        .tournament-place {
+            color: var(--color-fire);
+            font-weight: 700;
+        }
+
+        /* ====== КНОПКИ ДЕЙСТВИЙ ====== */
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-fire), #ff7043);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+        }
+
+        @media (hover: hover) {
+            .btn-primary:hover {
+                box-shadow: 0 6px 20px rgba(255, 87, 34, 0.5);
+                transform: translateY(-2px);
+            }
+        }
+
+        .btn-secondary {
+            background: rgba(30, 144, 255, 0.15);
+            color: var(--color-ice);
+            border: 1px solid rgba(30, 144, 255, 0.4);
+        }
+
+        @media (hover: hover) {
+            .btn-secondary:hover {
+                background: rgba(30, 144, 255, 0.25);
+                border-color: rgba(30, 144, 255, 0.7);
+            }
+        }
+
+        /* ====== МОДАЛЬНОЕ ОКНО ПРЕДПРОСМОТРА ====== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--color-dark);
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 420px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color var(--transition);
+        }
+
+        @media (hover: hover) {
+            .modal-close:hover {
+                color: var(--color-fire);
+            }
+        }
+
+        /* ====== АДАПТИВНОСТЬ ДЛЯ МОБИЛОК ====== */
+        @media (max-width: 480px) {
+            .player-card {
+                padding: 16px;
+                max-width: 100%;
+            }
+
+            .nickname {
+                font-size: 20px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ====== РЕЖИМ "ПОДЕЛИТЬСЯ" (ДЛЯ СКРИНШОТА) ====== */
+        .player-card.share-mode {
+            margin: 0;
+            border-radius: 20px;
+            box-shadow: 0 0 60px rgba(255, 87, 34, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- КАРТОЧКА ИГРОКА -->
+    <div class="player-card" id="playerCard">
+        <!-- HEADER -->
+        <div class="card-header">
+            <div class="avatar-container">
+                <div class="avatar-ring"></div>
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%231a1a1a'/%3E%3Ccircle cx='50' cy='35' r='15' fill='%23FF5722'/%3E%3Cpath d='M30 65 Q50 55 70 65 Q70 80 50 85 Q30 80 30 65' fill='%23FF5722'/%3E%3C/svg%3E" alt="Player Avatar" class="avatar-img">
+            </div>
+            <div class="nickname" id="nickname">ALEX</div>
+            <div class="rank-badge" id="rankBadge">TOP-10</div>
+        </div>
+
+        <!-- ОСНОВНЫЕ СТАТЫ -->
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-value" id="rating">1842</span>
+                <span class="stat-label">Рейтинг</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="winRate">78</span>
+                <span class="stat-label">Win %</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="tournaments">24</span>
+                <span class="stat-label">Турниров</span>
+            </div>
+        </div>
+
+        <!-- ДОСТИЖЕНИЯ -->
+        <div class="achievements-section">
+            <div class="section-title">
+                <i class="fas fa-trophy"></i> Достижения
+            </div>
+            <div class="achievements-grid" id="achievementsGrid">
+                <div class="achievement-badge gold" title="1-е место: Open Beach 2024">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <div class="achievement-badge gold" title="1-е место: Championship 2024">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="achievement-badge silver" title="2-е место: Spring Cup">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="achievement-badge bronze" title="3-е место: Summer Series">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="achievement-badge gold" title="Лучший либеро">
+                    <i class="fas fa-dumbbell"></i>
+                </div>
+                <div class="achievement-badge silver" title="Лучший атакующий">
+                    <i class="fas fa-bolt"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЛИЧНАЯ ИНФОРМАЦИЯ -->
+        <div class="personal-info">
+            <div class="info-row">
+                <span class="info-label">Номер майки</span>
+                <span class="info-value" id="jerseyNumber">17</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Социальные сети</span>
+                <div class="social-links">
+                    <a href="#" class="social-icon" title="Telegram">
+                        <i class="fab fa-telegram"></i>
+                    </a>
+                    <a href="#" class="social-icon" title="VK">
+                        <i class="fab fa-vk"></i>
+                    </a>
+                    <a href="#" class="social-icon" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ИСТОРИЯ ТУРНИРОВ -->
+        <div class="history-section">
+            <div class="section-title">
+                <i class="fas fa-history"></i> Последние турниры
+            </div>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50%;">Турнир</th>
+                        <th style="width: 25%;">Дата</th>
+                        <th style="width: 25%;">Место</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <tr>
+                        <td class="tournament-name">Open Beach 2024</td>
+                        <td>24.02.24</td>
+                        <td class="tournament-place">🥇 1-е</td>
+                    </tr>
+                    <tr>
+                        <td class="tournament-name">Winter Cup</td>
+                        <td>10.02.24</td>
+                        <td class="tournament-place">🥉 3-е</td>
+                    </tr>
+                    <tr>
+                        <td class="tournament-name">Championship</td>
+                        <td>28.01.24</td>
+                        <td class="tournament-place">🥇 1-е</td>
+                    </tr>
+                    <tr>
+                        <td class="tournament-name">Spring Volley</td>
+                        <td>15.01.24</td>
+                        <td class="tournament-place">🥈 2-е</td>
+                    </tr>
+                    <tr>
+                        <td class="tournament-name">New Year Cup</td>
+                        <td>30.12.23</td>
+                        <td class="tournament-place">🥉 3-е</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- КНОПКИ ДЕЙСТВИЙ -->
+        <div class="actions">
+            <button class="btn btn-primary" id="shareBtn">
+                <i class="fas fa-share-alt"></i> Поделиться
+            </button>
+            <button class="btn btn-secondary" id="viewFullBtn">
+                <i class="fas fa-expand"></i> Профиль
+            </button>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ПРЕДПРОСМОТРА -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Готово для сторис 📸</div>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div id="playerCardPreview"></div>
+            <div class="actions" style="margin-top: 16px;">
+                <button class="btn btn-primary" id="screenshotBtn">
+                    <i class="fas fa-camera"></i> Скачать
+                </button>
+                <button class="btn btn-secondary" id="copyLink">
+                    <i class="fas fa-link"></i> Скопировать ссылку
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- СКРИПТ -->
+    <script>
+        // ====== КОНФИГУРАЦИЯ ИГРОКА ======
+        const playerData = {
+            nickname: 'ALEX',
+            rank: 'TOP-10',
+            rating: 1842,
+            winRate: 78,
+            tournaments: 24,
+            jerseyNumber: 17,
+            avatar: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%231a1a1a%22/%3E%3Ccircle cx=%2250%22 cy=%2235%22 r=%2215%22 fill=%22%23FF5722%22/%3E%3Cpath d=%22M30 65 Q50 55 70 65 Q70 80 50 85 Q30 80 30 65%22 fill=%22%23FF5722%22/%3E%3C/svg%3E',
+            achievements: [
+                { type: 'gold', icon: 'medal', title: '1-е место: Open Beach 2024' },
+                { type: 'gold', icon: 'crown', title: '1-е место: Championship 2024' },
+                { type: 'silver', icon: 'star', title: '2-е место: Spring Cup' },
+                { type: 'bronze', icon: 'fire', title: '3-е место: Summer Series' },
+                { type: 'gold', icon: 'dumbbell', title: 'Лучший либеро' },
+                { type: 'silver', icon: 'bolt', title: 'Лучший атакующий' }
+            ],
+            tournaments: [
+                { name: 'Open Beach 2024', date: '24.02.24', place: '🥇 1-е' },
+                { name: 'Winter Cup', date: '10.02.24', place: '🥉 3-е' },
+                { name: 'Championship', date: '28.01.24', place: '🥇 1-е' },
+                { name: 'Spring Volley', date: '15.01.24', place: '🥈 2-е' },
+                { name: 'New Year Cup', date: '30.12.23', place: '🥉 3-е' }
+            ]
+        };
+
+        // ====== DOM ЭЛЕМЕНТЫ ======
+        const elements = {
+            nickname: document.getElementById('nickname'),
+            rankBadge: document.getElementById('rankBadge'),
+            rating: document.getElementById('rating'),
+            winRate: document.getElementById('winRate'),
+            tournaments: document.getElementById('tournaments'),
+            jerseyNumber: document.getElementById('jerseyNumber'),
+            playerCard: document.getElementById('playerCard'),
+            shareBtn: document.getElementById('shareBtn'),
+            viewFullBtn: document.getElementById('viewFullBtn'),
+            shareModal: document.getElementById('shareModal'),
+            closeModal: document.getElementById('closeModal'),
+            screenshotBtn: document.getElementById('screenshotBtn'),
+            copyLink: document.getElementById('copyLink'),
+            playerCardPreview: document.getElementById('playerCardPreview'),
+            historyTableBody: document.getElementById('historyTableBody'),
+            achievementsGrid: document.getElementById('achievementsGrid')
+        };
+
+        // ====== ИНИЦИАЛИЗАЦИЯ ДАННЫХ ======
+        function initializePlayerCard() {
+            elements.nickname.textContent = playerData.nickname;
+            elements.rankBadge.textContent = playerData.rank;
+            elements.rating.textContent = playerData.rating;
+            elements.winRate.textContent = playerData.winRate;
+            elements.tournaments.textContent = playerData.tournaments;
+            elements.jerseyNumber.textContent = playerData.jerseyNumber;
+        }
+
+        // ====== ОБРАБОТЧИКИ КНОПОК ======
+        elements.shareBtn.addEventListener('click', () => {
+            elements.playerCardPreview.innerHTML = elements.playerCard.innerHTML;
+            elements.shareModal.classList.add('active');
+        });
+
+        elements.closeModal.addEventListener('click', () => {
+            elements.shareModal.classList.remove('active');
+        });
+
+        elements.shareModal.addEventListener('click', (e) => {
+            if (e.target === elements.shareModal) {
+                elements.shareModal.classList.remove('active');
+            }
+        });
+
+        // Скачивание скриншота (используем html2canvas библиотеку если нужно)
+        elements.screenshotBtn.addEventListener('click', async () => {
+            // Функция работает с встроенными эффектами
+            const card = elements.playerCardPreview.querySelector('.player-card') || elements.playerCard;
+            alert('✨ Скриншот готов! На реальном сайте интегрируй html2canvas.\n\nПримерный код:\n\nhtml2canvas(card).then(canvas => {\n  const link = document.createElement("a");\n  link.href = canvas.toDataURL();\n  link.download = "player-card.png";\n  link.click();\n})');
+        });
+
+        elements.copyLink.addEventListener('click', () => {
+            const playerUrl = `${window.location.origin}?player=${playerData.nickname}`;
+            navigator.clipboard.writeText(playerUrl);
+            alert('🔗 Ссылка скопирована в буфер обмена!');
+        });
+
+        // ====== ИНИЦИАЛИЗАЦИЯ ======
+        initializePlayerCard();
+
+        // ====== ФУНКЦИИ ДЛЯ ИНТЕГРАЦИИ В DJANGO ======
+        /**
+         * Обновить данные игрока (используй эту функцию при загрузке данных из API)
+         * @param {Object} newData - Новые данные игрока
+         */
+        function updatePlayerData(newData) {
+            const merged = { ...playerData, ...newData };
+            playerData.nickname = merged.nickname;
+            playerData.rank = merged.rank;
+            playerData.rating = merged.rating;
+            playerData.winRate = merged.winRate;
+            playerData.tournaments = merged.tournaments;
+            playerData.jerseyNumber = merged.jerseyNumber;
+
+            initializePlayerCard();
+        }
+
+        /**
+         * Получить данные игрока в JSON формате (для отправки на сервер)
+         */
+        function getPlayerData() {
+            return playerData;
+        }
+
+        // Экспорт функций в глобальную область (для использования из шаблонов Django)
+        window.playerCardAPI = { updatePlayerData, getPlayerData };
+    </script>
+</body>
+</html>

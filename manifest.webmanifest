@@ -1,0 +1,37 @@
+{
+  "name": "Лютые пляжники · King of the Court",
+  "short_name": "Volley KOTC",
+  "description": "Счёт, таймеры, ростер, регистрация и синхронизация турниров по пляжному волейболу.",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0d0d1a",
+  "theme_color": "#0d0d1a",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./assets/logo_lp_192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/logo_lp_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

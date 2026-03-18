@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /g/KING/1803/IPT-main/assets/js/*.js /g/KING/1803/IPT-main/assets/js/**/*.js)",
+      "Bash(xargs wc:*)"
+    ]
+  }
+}
